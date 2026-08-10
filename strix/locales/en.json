@@ -55,5 +55,13 @@
   "cli.unknown_model": "UNKNOWN MODEL NAME",
   "cli.model_quality_warning": "MODEL QUALITY WARNING",
   "cli.interactive_setup_unavailable": "INTERACTIVE SETUP UNAVAILABLE",
-  "cli.scan_preparation_failed": "SCAN PREPARATION FAILED"
+  "cli.scan_preparation_failed": "SCAN PREPARATION FAILED",
+  "cli.test_initiated": "Penetration test initiated",
+  "cli.test_in_progress": "Penetration test in progress",
+  "cli.test_summary": "Penetration test summary",
+  "cli.vulnerabilities_realtime": "Vulnerabilities will be displayed in real-time.",
+  "cli.starting_up": "Starting up",
+  "cli.error_during_test": "Error during penetration test:",
+  "cli.vulnerabilities_count": "Vulnerabilities",
+  "cli.no_exploitable": "No exploitable vulnerabilities detected"
 }

@@ -55,5 +55,13 @@
   "cli.unknown_model": "NOMBRE DE MODELO DESCONOCIDO",
   "cli.model_quality_warning": "ADVERTENCIA DE CALIDAD DEL MODELO",
   "cli.interactive_setup_unavailable": "CONFIGURACIÓN INTERACTIVA NO DISPONIBLE",
-  "cli.scan_preparation_failed": "FALLO EN PREPARACIÓN DEL ESCANEO"
+  "cli.scan_preparation_failed": "FALLO EN PREPARACIÓN DEL ESCANEO",
+  "cli.test_initiated": "Prueba de penetración iniciada",
+  "cli.test_in_progress": "Prueba de penetración en progreso",
+  "cli.test_summary": "Resumen de prueba de penetración",
+  "cli.vulnerabilities_realtime": "Las vulnerabilidades se mostrarán en tiempo real.",
+  "cli.starting_up": "Iniciando",
+  "cli.error_during_test": "Error durante la prueba de penetración:",
+  "cli.vulnerabilities_count": "Vulnerabilidades",
+  "cli.no_exploitable": "No se detectaron vulnerabilidades explotables"
 }
