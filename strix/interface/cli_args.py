@@ -18,6 +18,25 @@ from strix.interface.utils import (
 )
 
 
+def _pre_resolve_language() -> None:
+    """Set language from --language/-l before argparse runs.
+
+    Argparse evaluates help text at parse time, so we must set the language
+    BEFORE parse_args() is called. This pre-scans sys.argv for the flag.
+    """
+    argv = sys.argv[1:]
+    for i, arg in enumerate(argv):
+        if arg in ("-l", "--language") and i + 1 < len(argv):
+            from strix.i18n import set_language
+            set_language(argv[i + 1])
+            return
+        # Handle --language=es form
+        if arg.startswith("--language="):
+            from strix.i18n import set_language
+            set_language(arg.split("=", 1)[1])
+            return
+
+
 def get_version() -> str:
     try:
         from importlib.metadata import version
@@ -50,6 +69,9 @@ def _positive_int(value: str) -> int:
 
 
 def parse_arguments() -> argparse.Namespace:
+    # Pre-scan for --language before argparse runs so help text can be translated
+    _pre_resolve_language()
+
     parser = argparse.ArgumentParser(
         description="Strix Multi-Agent Cybersecurity Penetration Testing Tool",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -255,11 +277,6 @@ Examples:
     args.local_sources = []
     args.diff_scope = {"active": False}
     args.run_name = None
-
-    # Set language from CLI flag (highest priority in resolution chain)
-    if args.language:
-        from strix.i18n import set_language
-        set_language(args.language)
 
     if args.config:
         apply_config_override(validate_config_file(args.config))

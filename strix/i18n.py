@@ -41,14 +41,17 @@ def _detect_language() -> str:
     if env_lang:
         return _normalize_lang(env_lang)
 
-    # 3. Config file
+    # 3. Config file (canonical format: {"env": {"STRIX_LANGUAGE": "es"}})
     try:
         config_path = Path.home() / ".strix" / "cli-config.json"
         if config_path.exists():
             data = json.loads(config_path.read_text(encoding="utf-8"))
-            config_lang = data.get("language", "").strip().lower()
-            if config_lang:
-                return _normalize_lang(config_lang)
+            if isinstance(data, dict):
+                env_block = data.get("env", {})
+                if isinstance(env_block, dict):
+                    config_lang = env_block.get("STRIX_LANGUAGE", "").strip().lower()
+                    if config_lang:
+                        return _normalize_lang(config_lang)
     except (json.JSONDecodeError, OSError):
         pass
 
