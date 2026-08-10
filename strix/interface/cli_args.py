@@ -111,6 +111,15 @@ Examples:
     )
 
     parser.add_argument(
+        "-l",
+        "--language",
+        type=str,
+        default=None,
+        help="Language for UI and agent responses (e.g., 'en', 'es'). "
+        "Default: auto-detect from environment.",
+    )
+
+    parser.add_argument(
         "-t",
         "--target",
         type=str,
@@ -246,6 +255,11 @@ Examples:
     args.local_sources = []
     args.diff_scope = {"active": False}
     args.run_name = None
+
+    # Set language from CLI flag (highest priority in resolution chain)
+    if args.language:
+        from strix.i18n import set_language
+        set_language(args.language)
 
     if args.config:
         apply_config_override(validate_config_file(args.config))
