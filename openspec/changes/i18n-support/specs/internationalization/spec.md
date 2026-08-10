@@ -143,35 +143,69 @@ The system SHALL ship `strix/locales/es.json` with Spanish translations for Phas
 ## Locale Key Structure
 
 ```json
-// en.json
+// en.json - CLI keys (Phase 1)
 {
-  "cli.target_help": "Target to test: URL, repository, local directory path, domain name, IP address...",
-  "cli.instruction_help": "Custom instructions for the penetration test.",
+  "cli.target_help": "Target to test: URL, repository, local directory path...",
   "cli.scan_started": "Starting scan against {target}",
   "cli.scan_completed": "Scan completed. {count} vulnerabilities found.",
   "cli.error_no_target": "No target specified. Use --target or --target-list.",
-  "cli.error_invalid_target": "Invalid target: {target}",
-  "cli.auth_login_prompt": "Enter your API key",
-  "cli.auth_login_success": "Authentication successful",
-  "cli.auth_login_failure": "Authentication failed: {reason}",
-  "cli.progress_recon": "Performing reconnaissance...",
-  "cli.progress_scanning": "Scanning {target}...",
-  "cli.progress_reporting": "Generating report..."
+  "cli.test_initiated": "Penetration test initiated",
+  "cli.test_in_progress": "Penetration test in progress",
+  "cli.vulnerabilities_realtime": "Vulnerabilities will be displayed in real-time.",
+  "cli.completion_title": "Penetration test completed",
+  "cli.session_ended": "SESSION ENDED"
 }
 
-// es.json
+// en.json - Report keys (Phase 2)
 {
-  "cli.target_help": "Objetivo a probar: URL, repositorio, directorio local, dominio, dirección IP...",
-  "cli.instruction_help": "Instrucciones personalizadas para la prueba de penetración.",
+  "report.title": "Security Penetration Test Report",
+  "report.generated": "Generated:",
+  "report.description": "Description",
+  "report.evidence": "Evidence",
+  "report.impact": "Impact",
+  "report.technical_analysis": "Technical Analysis",
+  "report.proof_of_concept": "Proof of Concept",
+  "report.code_analysis": "Code Analysis",
+  "report.remediation": "Remediation",
+  "report.assumptions": "Assumptions",
+  "report.severity": "Severity",
+  "report.found": "Found",
+  "report.target": "Target",
+  "report.location": "Location",
+  "report.suggested_fix": "Suggested Fix"
+}
+
+// es.json - CLI keys (Phase 1)
+{
+  "cli.target_help": "Objetivo a probar: URL, repositorio, directorio local...",
   "cli.scan_started": "Iniciando escaneo contra {target}",
   "cli.scan_completed": "Escaneo completado. {count} vulnerabilidades encontradas.",
   "cli.error_no_target": "No se especificó objetivo. Use --target o --target-list.",
-  "cli.error_invalid_target": "Objetivo inválido: {target}",
-  "cli.auth_login_prompt": "Ingrese su clave API",
-  "cli.auth_login_success": "Autenticación exitosa",
-  "cli.auth_login_failure": "Autenticación fallida: {reason}",
-  "cli.progress_recon": "Realizando reconocimiento...",
-  "cli.progress_scanning": "Escaneando {target}...",
-  "cli.progress_reporting": "Generando informe..."
+  "cli.test_initiated": "Prueba de penetración iniciada",
+  "cli.test_in_progress": "Prueba de penetración en progreso",
+  "cli.vulnerabilities_realtime": "Las vulnerabilidades se mostrarán en tiempo real.",
+  "cli.completion_title": "Prueba de penetración completada",
+  "cli.session_ended": "SESIÓN FINALIZADA"
+}
+
+// es.json - Report keys (Phase 2)
+{
+  "report.title": "Informe de Prueba de Penetración de Seguridad",
+  "report.generated": "Generado:",
+  "report.description": "Descripción",
+  "report.evidence": "Evidencia",
+  "report.impact": "Impacto",
+  "report.technical_analysis": "Análisis Técnico",
+  "report.proof_of_concept": "Prueba de Concepto",
+  "report.code_analysis": "Análisis de Código",
+  "report.remediation": "Remediación",
+  "report.assumptions": "Suposiciones",
+  "report.severity": "Severidad",
+  "report.found": "Encontrado",
+  "report.target": "Objetivo",
+  "report.location": "Ubicación",
+  "report.suggested_fix": "Corrección Sugerida"
 }
 ```
+
+## Total Keys: 83 (65 CLI + 18 Report)
