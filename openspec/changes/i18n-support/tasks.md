@@ -1,4 +1,4 @@
-# Tasks: i18n Support — Phase 1
+# Tasks: i18n Support — Phase 1 & 2
 
 ## Review Workload Forecast
 
@@ -8,7 +8,9 @@
 
 ---
 
-## Task 1: Add language field to Settings
+## Phase 1: CLI & Agent Responses ✅ COMPLETE
+
+## Task 1: Add language field to Settings ✅
 
 **File**: `strix/config/settings.py`
 
@@ -30,7 +32,7 @@ class Settings(BaseSettings):
 
 ---
 
-## Task 2: Add --language CLI flag
+## Task 2: Add --language CLI flag ✅
 
 **File**: `strix/interface/cli_args.py`
 
@@ -63,7 +65,7 @@ if args.language:
 
 ---
 
-## Task 3: Inject language directive into agent prompts
+## Task 3: Inject language directive into agent prompts ✅
 
 **Files**: 
 - `strix/agents/prompt.py`
@@ -101,7 +103,7 @@ rendered = env.get_template("system_prompt.jinja").render(
 
 ---
 
-## Task 4: Integrate t() into main CLI messages
+## Task 4: Integrate t() into main CLI messages ✅
 
 **File**: `strix/interface/main.py`
 
@@ -131,7 +133,7 @@ Key strings to translate:
 
 ---
 
-## Task 5: Add tests
+## Task 5: Add tests ✅
 
 **File**: `tests/test_i18n.py`
 
@@ -159,7 +161,7 @@ def test_all_en_keys_exist_in_es()
 
 ---
 
-## Task 6: Verify with make check-all
+## Task 6: Verify with make check-all ✅
 
 **Description**: Run full quality suite to ensure no regressions.
 
@@ -189,3 +191,111 @@ Task 3 (Jinja) ─────┘                        ├──> Task 4 (Main
 ```
 
 Tasks 1 and 3 can be done in parallel. Task 2 depends on Task 1. Task 4 depends on Task 2. Task 5 depends on all. Task 6 is final verification.
+
+---
+
+## Phase 2: Report Translations ✅ COMPLETE
+
+## Task 7: Add report translation keys ✅
+
+**Files**: 
+- `strix/locales/en.json`
+- `strix/locales/es.json`
+
+**Description**: Add 18 translation keys for report headings and metadata labels.
+
+**Keys added**:
+- `report.title` — Executive report title
+- `report.generated` — Generated timestamp label
+- `report.description` — Description section heading
+- `report.evidence` — Evidence section heading
+- `report.impact` — Impact section heading
+- `report.severity` — Severity metadata label
+- `report.target` — Target metadata label
+- `report.package` — Package metadata label
+- `report.remediation` — Remediation section heading
+- `report.references` — References section heading
+- `report.cvss_score` — CVSS score label
+- `report.cwe_id` — CWE ID label
+- `report.affected_versions` — Affected versions label
+- `report.fixed_versions` — Fixed versions label
+- `report.proof_of_concept` — Proof of concept heading
+- `report.steps_to_reproduce` — Steps to reproduce heading
+- `report.expected_result` — Expected result label
+- `report.actual_result` — Actual result label
+
+**Acceptance**:
+- [x] All 18 keys exist in en.json
+- [x] All 18 keys exist in es.json with Spanish translations
+- [x] No missing keys between locales
+
+**Dependencies**: Task 1 (Settings.language)
+
+---
+
+## Task 8: Translate report writer ✅
+
+**File**: `strix/report/writer.py`
+
+**Description**: Replace hardcoded English report strings with `t()` calls.
+
+**Changes**:
+```python
+from strix.i18n import t
+
+# Replace strings like:
+# "Description"
+# With:
+# t("report.description")
+```
+
+**Sections translated**:
+- Executive report title and metadata
+- Vulnerability detail headings (Description, Evidence, Impact, etc.)
+- CVSS/CWE labels
+- Remediation and references sections
+- Proof of concept sections
+
+**Acceptance**:
+- [x] `--language es` → Spanish report headings
+- [x] `--language en` → English report headings (default)
+- [x] SARIF and vulnerabilities.json stay English
+
+**Dependencies**: Task 7
+
+---
+
+## Task 9: Add Phase 2 tests ✅
+
+**File**: `tests/test_i18n.py`
+
+**Description**: Add tests for report translation keys.
+
+**Test cases added**:
+```python
+def test_report_keys_exist_in_both_locales()
+def test_report_t_returns_spanish_when_language_set()
+def test_report_t_returns_english_by_default()
+```
+
+**Acceptance**:
+- [x] `uv run pytest tests/test_i18n.py -v` passes
+- [x] All report keys validated
+
+**Dependencies**: Task 7, Task 8
+
+---
+
+## Phase 3: Go TUI (PENDING)
+
+**Status**: Not started
+**Scope**: ~300 strings across 45 Go files in `strix/interface/tui/internal/`
+**Approach**: Backend socket serves locale JSON; Go code calls translation function
+
+---
+
+## Phase 4: React Viewer (PENDING)
+
+**Status**: Not started
+**Scope**: UI strings in `strix/interface/viewer/frontend/src/`
+**Approach**: Fetch locale JSON; React hooks for translations
