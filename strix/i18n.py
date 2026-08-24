@@ -17,6 +17,7 @@ SUPPORTED_LANGUAGES: frozenset[str] = frozenset({"en", "es"})
 
 # Module-level state
 _language: str | None = None
+_config_path: Path | None = None
 _locales: dict[str, dict[str, str]] = {}
 _lock = threading.Lock()
 _locales_dir: Path = Path(__file__).parent / "locales"
@@ -28,7 +29,7 @@ def _detect_language() -> str:
     Priority:
     1. _language (set by --language CLI flag or set_language())
     2. STRIX_LANGUAGE env var
-    3. ~/.strix/cli-config.json "language" field
+    3. Config file (--config override or ~/.strix/cli-config.json)
     4. LANG / LC_ALL system locale (first 2 chars)
     5. "en" default
     """
@@ -43,7 +44,7 @@ def _detect_language() -> str:
 
     # 3. Config file (canonical format: {"env": {"STRIX_LANGUAGE": "es"}})
     try:
-        config_path = Path.home() / ".strix" / "cli-config.json"
+        config_path = _config_path or (Path.home() / ".strix" / "cli-config.json")
         if config_path.exists():
             data = json.loads(config_path.read_text(encoding="utf-8"))
             if isinstance(data, dict):
@@ -102,6 +103,17 @@ def set_language(lang: str | None) -> None:
     """Set the active language. Called from CLI args parsing."""
     global _language  # noqa: PLW0603
     _language = _normalize_lang(lang) if lang else None
+
+
+def set_config_path(path: str | Path | None) -> None:
+    """Override the config file used for language resolution.
+
+    ``--config`` selects a custom config file; its ``env.STRIX_LANGUAGE``
+    should drive localization just like the default ``~/.strix/cli-config.json``.
+    Pass ``None`` to clear the override.
+    """
+    global _config_path  # noqa: PLW0603
+    _config_path = Path(path) if path else None
 
 
 def get_language() -> str:

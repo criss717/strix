@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -18,18 +19,22 @@ from strix.i18n import (
     _normalize_lang,
     get_language,
     get_language_directive,
+    set_config_path,
     set_language,
     t,
 )
+from strix.interface import cli_args
 
 
 @pytest.fixture(autouse=True)
 def _reset_i18n_state():
     """Reset module-level state between tests."""
     mod._language = None
+    mod._config_path = None
     mod._locales.clear()
     yield
     mod._language = None
+    mod._config_path = None
     mod._locales.clear()
 
 
@@ -250,6 +255,96 @@ class TestCliHelpKeys:
         es_value = t("cli.unknown_model_hint")
         assert "por ejemplo" in es_value
 
+    def test_example_titles_translate(self):
+        set_language("es")
+        assert "aplicación web" in t("cli.example_web_app")
+        assert "repositorio" in t("cli.example_github")
+        assert "código local" in t("cli.example_local_code")
+        assert "spec API" in t("cli.example_api_spec")
+        assert "dirección IP" in t("cli.example_ip")
+        assert "archivo" in t("cli.example_file")
+        set_language("en")
+        assert t("cli.example_web_app") == "Web application penetration test"
+
+
+class TestCustomConfigPath:
+    """``--config`` should drive language resolution like the default config."""
+
+    def test_custom_config_path_resolves_language(self, tmp_path):
+        config = tmp_path / "custom.json"
+        config.write_text(
+            json.dumps({"env": {"STRIX_LANGUAGE": "es"}}), encoding="utf-8"
+        )
+        set_config_path(config)
+        assert get_language() == "es"
+
+    def test_custom_config_path_ignored_without_env_key(self, tmp_path):
+        config = tmp_path / "custom.json"
+        config.write_text(json.dumps({"env": {}}), encoding="utf-8")
+        set_config_path(config)
+        with patch.dict(os.environ, {}, clear=True):
+            assert get_language() == "en"
+
+    def test_custom_config_missing_file_falls_back(self, tmp_path):
+        set_config_path(tmp_path / "does-not-exist.json")
+        with patch.dict(os.environ, {}, clear=True):
+            assert get_language() == "en"
+
+    def test_env_var_overrides_custom_config(self, tmp_path):
+        config = tmp_path / "custom.json"
+        config.write_text(
+            json.dumps({"env": {"STRIX_LANGUAGE": "es"}}), encoding="utf-8"
+        )
+        set_config_path(config)
+        with patch.dict(os.environ, {"STRIX_LANGUAGE": "en"}):
+            assert get_language() == "en"
+
+    def test_explicit_language_overrides_custom_config(self, tmp_path):
+        config = tmp_path / "custom.json"
+        config.write_text(
+            json.dumps({"env": {"STRIX_LANGUAGE": "es"}}), encoding="utf-8"
+        )
+        set_config_path(config)
+        set_language("en")
+        assert get_language() == "en"
+
+
+class TestArgparseBuiltins:
+    """argparse's built-in strings must translate through the i18n layer."""
+
+    def test_usage_translates(self):
+        set_language("es")
+        assert t("cli.argparse_usage") == "uso: "
+        set_language("en")
+        assert t("cli.argparse_usage") == "usage: "
+
+    def test_options_translates(self):
+        set_language("es")
+        assert t("cli.argparse_options") == "opciones"
+        set_language("en")
+        assert t("cli.argparse_options") == "options"
+
+    def test_help_help_translates(self):
+        set_language("es")
+        assert t("cli.argparse_help") == "muestra este mensaje de ayuda y sale"
+
+    def test_version_help_translates(self):
+        set_language("es")
+        assert t("cli.argparse_version") == (
+            "muestra el número de versión del programa y sale"
+        )
+
+    def test_unrecognized_arguments_translates(self):
+        set_language("es")
+        assert t("cli.argparse_unrecognized") == "argumentos no reconocidos: %s"
+
+    def test_argparse_override_is_wired(self):
+        # The override routes argparse's gettext calls through t().
+        set_language("es")
+        assert cli_args._translate_argparse("usage: ") == "uso: "
+        assert cli_args._translate_argparse("options") == "opciones"
+        assert cli_args._translate_argparse("unknown string") == "unknown string"
+        assert argparse._("usage: ") == "uso: "
 
 
 class TestSettingsLanguageField:

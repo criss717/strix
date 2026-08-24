@@ -20,23 +20,59 @@ from strix.interface.utils import (
 )
 
 
-def _pre_resolve_language() -> None:
-    """Set language from --language/-l before argparse runs.
+# Translate argparse's built-in strings (usage, options, error, help/version)
+# through the i18n layer. argparse routes these through ``gettext.gettext``,
+# so replacing ``argparse._`` with a ``t()``-backed lookup localizes them.
+_ARGPARSE_MESSAGE_KEYS: dict[str, str] = {
+    "usage: ": "cli.argparse_usage",
+    "options": "cli.argparse_options",
+    "show this help message and exit": "cli.argparse_help",
+    "show program's version number and exit": "cli.argparse_version",
+    "%(prog)s: error: %(message)s\n": "cli.argparse_error",
+    "unrecognized arguments: %s": "cli.argparse_unrecognized",
+    "the following arguments are required: %s": "cli.argparse_required",
+}
 
-    Argparse evaluates help text at parse time, so we must set the language
-    BEFORE parse_args() is called. This pre-scans sys.argv for the flag.
+
+def _translate_argparse(message: str) -> str:
+    """Return the localized form of an argparse built-in string."""
+    key = _ARGPARSE_MESSAGE_KEYS.get(message)
+    if key is None:
+        return message
+    translated = t(key)
+    return translated if translated != key else message
+
+
+argparse._ = _translate_argparse  # type: ignore[attr-defined]
+
+
+def _pre_resolve_language() -> None:
+    """Resolve language from --language/-l and --config before argparse runs.
+
+    Argparse evaluates help text at parse time, so we must resolve the language
+    BEFORE parse_args() is called. This pre-scans sys.argv for the flags.
+    Priority matches ``_detect_language``: --language > STRIX_LANGUAGE env >
+    --config file > default config > system locale.
     """
     argv = sys.argv[1:]
+    language: str | None = None
+    config_path: str | None = None
     for i, arg in enumerate(argv):
         if arg in ("-l", "--language") and i + 1 < len(argv):
-            from strix.i18n import set_language
-            set_language(argv[i + 1])
-            return
-        # Handle --language=es form
-        if arg.startswith("--language="):
-            from strix.i18n import set_language
-            set_language(arg.split("=", 1)[1])
-            return
+            language = argv[i + 1]
+        elif arg.startswith("--language="):
+            language = arg.split("=", 1)[1]
+        elif arg == "--config" and i + 1 < len(argv):
+            config_path = argv[i + 1]
+        elif arg.startswith("--config="):
+            config_path = arg.split("=", 1)[1]
+
+    from strix.i18n import set_config_path, set_language
+
+    if language:
+        set_language(language)
+    elif config_path:
+        set_config_path(config_path)
 
 
 def get_version() -> str:
@@ -79,45 +115,45 @@ def parse_arguments() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=f"""
 {t("cli.examples_header")}
-  # Web application penetration test
+  # {t("cli.example_web_app")}
   strix --target https://example.com
 
-  # GitHub repository analysis
+  # {t("cli.example_github")}
   strix --target https://github.com/user/repo
   strix --target git@github.com:user/repo.git
 
-  # Local code analysis
+  # {t("cli.example_local_code")}
   strix --target ./my-project
 
-  # API spec test (OpenAPI/Swagger file or Postman collection export)
+  # {t("cli.example_api_spec")}
   strix --target ./openapi.yaml --target https://api.example.com
   strix --target ./collection.postman_collection.json
 
-  # Postman collection pulled live by id (needs POSTMAN_API_KEY); optional environment
+  # {t("cli.example_postman")}
   strix --target postman://<collection-uuid> --target https://api.example.com
   strix --target "postman://<collection-uuid>?env=<environment-uuid>"
 
-  # Domain penetration test
+  # {t("cli.example_domain")}
   strix --target example.com
 
-  # IP address penetration test
+  # {t("cli.example_ip")}
   strix --target 192.168.1.42
 
-  # Multiple targets (e.g., white-box testing with source and deployed app)
+  # {t("cli.example_multiple")}
   strix --target https://github.com/user/repo --target https://example.com
   strix --target ./my-project --target https://staging.example.com --target https://prod.example.com
 
-  # Targets from a file, one target per non-empty, non-comment line
+  # {t("cli.example_file")}
   strix --target-list ./targets.txt
 
-  # Custom instructions (inline)
+  # {t("cli.example_instruction_inline")}
   strix --target example.com --instruction "Focus on authentication vulnerabilities"
 
-  # Custom instructions (from file)
+  # {t("cli.example_instruction_file")}
   strix --target example.com --instruction-file ./instructions.txt
   strix --target https://app.com --instruction-file /path/to/detailed_instructions.md
 
-  # Extra files placed in the sandbox workspace
+  # {t("cli.example_workspace")}
   strix --target ./my-project --workspace-file ./wordlist.txt
   strix --target https://app.com --workspace-file ./openapi.yaml:specs/openapi.yaml
         """,
