@@ -156,17 +156,16 @@ async def warm_up_llm(show_model_warning: bool = True) -> None:
             and not llm.api_base
         ):
             warn_text = Text()
-            warn_text.append("UNKNOWN MODEL NAME", style="bold yellow")
+            warn_text.append(t("cli.unknown_model"), style="bold yellow")
             warn_text.append("\n\n", style="white")
             warn_text.append(f"'{raw_model}'", style="bold cyan")
             warn_text.append(
-                " is not a known OpenAI model. Bare names route to OpenAI by default.\n"
-                "If you meant a non-OpenAI provider, use the '",
+                t("cli.unknown_model_body"),
                 style="white",
             )
             warn_text.append("<provider>/<model>", style="bold cyan")
             warn_text.append(
-                "' form, e.g. 'anthropic/claude-opus-4-7', 'deepseek/deepseek-v4-pro'.",
+                t("cli.unknown_model_hint"),
                 style="white",
             )
             console.print(
@@ -182,18 +181,17 @@ async def warm_up_llm(show_model_warning: bool = True) -> None:
 
         if show_model_warning and raw_model and not is_recommended_or_frontier_model(raw_model):
             warn_text = Text()
-            warn_text.append("MODEL QUALITY WARNING", style="bold yellow")
+            warn_text.append(t("cli.model_quality_warning"), style="bold yellow")
             warn_text.append("\n\n", style="white")
             warn_text.append(f"'{raw_model}'", style="bold cyan")
             warn_text.append(
-                " is not a recommended frontier model for Strix.\nSecurity scans work best with:\n",
+                t("cli.model_quality_warning_body"),
                 style="white",
             )
             for recommended_model in RECOMMENDED_MODEL_NAMES:
                 warn_text.append(f"• {recommended_model}\n", style="bold cyan")
             warn_text.append(
-                "\nYou can continue, but weaker models may miss vulnerabilities "
-                "or produce lower-quality findings.",
+                t("cli.model_quality_warning_footer"),
                 style="white",
             )
             console.print(

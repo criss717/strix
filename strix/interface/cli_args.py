@@ -77,8 +77,8 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=t("cli.description"),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
+        epilog=f"""
+{t("cli.examples_header")}
   # Web application penetration test
   strix --target https://example.com
 
@@ -175,11 +175,7 @@ Examples:
         type=str,
         action="append",
         metavar="PATH[:DEST]",
-        help="Place a file from this machine into the sandbox workspace before the scan "
-        "starts, for example a wordlist, an API specification, or notes. Repeat the option "
-        "for more files. DEST is the path inside /workspace and defaults to the file name "
-        "(for example '--workspace-file ./wordlist.txt:lists/wordlist.txt'). The file is "
-        "read-only inside the sandbox and lands outside every target directory.",
+        help=t("cli.workspace_file_help"),
     )
 
     parser.add_argument(

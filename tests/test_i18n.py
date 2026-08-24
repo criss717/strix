@@ -203,6 +203,55 @@ class TestLocaleKeyConsistency:
             assert locale_file.exists(), f"Missing locale file: {locale_file}"
 
 
+class TestCliHelpKeys:
+    """The CLI help and model-warning strings must translate in both locales."""
+
+    def test_workspace_file_help_translates(self):
+        set_language("en")
+        en_value = t("cli.workspace_file_help")
+        assert "sandbox workspace" in en_value
+        set_language("es")
+        es_value = t("cli.workspace_file_help")
+        assert "workspace del sandbox" in es_value
+        assert es_value != "cli.workspace_file_help"
+
+    def test_examples_header_translates(self):
+        set_language("es")
+        assert t("cli.examples_header") == "Ejemplos:"
+        set_language("en")
+        assert t("cli.examples_header") == "Examples:"
+
+    def test_model_quality_warning_body_translates(self):
+        set_language("en")
+        assert "frontier model" in t("cli.model_quality_warning_body")
+        set_language("es")
+        es_value = t("cli.model_quality_warning_body")
+        assert "modelo frontier" in es_value
+        assert es_value != "cli.model_quality_warning_body"
+
+    def test_model_quality_warning_footer_translates(self):
+        set_language("en")
+        assert "weaker models" in t("cli.model_quality_warning_footer")
+        set_language("es")
+        es_value = t("cli.model_quality_warning_footer")
+        assert "modelos más débiles" in es_value
+
+    def test_unknown_model_body_translates(self):
+        set_language("en")
+        assert "known OpenAI model" in t("cli.unknown_model_body")
+        set_language("es")
+        es_value = t("cli.unknown_model_body")
+        assert "modelo de OpenAI conocido" in es_value
+
+    def test_unknown_model_hint_translates(self):
+        set_language("en")
+        assert "form, e.g." in t("cli.unknown_model_hint")
+        set_language("es")
+        es_value = t("cli.unknown_model_hint")
+        assert "por ejemplo" in es_value
+
+
+
 class TestSettingsLanguageField:
     def test_settings_has_language_field(self):
         s = Settings()
