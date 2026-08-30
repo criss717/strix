@@ -346,6 +346,32 @@ class TestArgparseBuiltins:
         assert cli_args._translate_argparse("unknown string") == "unknown string"
         assert argparse._("usage: ") == "uso: "
 
+    def test_invalid_choice_translates(self):
+        set_language("es")
+        assert "inválida" in t("cli.argparse_invalid_choice")
+        assert "elija entre" in t("cli.argparse_invalid_choice")
+
+    def test_argument_error_translates(self):
+        set_language("es")
+        assert t("cli.argparse_argument_error") == "argumento %(argument_name)s: %(message)s"
+
+    def test_expected_arguments_translate(self):
+        set_language("es")
+        assert t("cli.argparse_expected_one") == "se espera un argumento"
+        assert "como máximo" in t("cli.argparse_expected_at_most")
+        assert "al menos" in t("cli.argparse_expected_at_least")
+
+    def test_unexpected_option_translates(self):
+        set_language("es")
+        assert t("cli.argparse_unexpected_option") == "opción inesperada: %s"
+
+    def test_validation_errors_translate(self):
+        set_language("es")
+        assert t("cli.invalid_float", value="abc") == "valor float inválido: 'abc'"
+        assert t("cli.invalid_int", value="abc") == "valor entero inválido: 'abc'"
+        assert t("cli.finite_number") == "debe ser un número finito mayor que 0"
+        assert t("cli.positive_integer") == "debe ser un entero mayor que 0"
+
 
 class TestSettingsLanguageField:
     def test_settings_has_language_field(self):

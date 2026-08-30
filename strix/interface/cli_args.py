@@ -32,6 +32,12 @@ _ARGPARSE_MESSAGE_KEYS: dict[str, str] = {
     "%(prog)s: error: %(message)s\n": "cli.argparse_error",
     "unrecognized arguments: %s": "cli.argparse_unrecognized",
     "the following arguments are required: %s": "cli.argparse_required",
+    "invalid choice: %(value)r (choose from %(choices)s)": "cli.argparse_invalid_choice",
+    "argument %(argument_name)s: %(message)s": "cli.argparse_argument_error",
+    "expected one argument": "cli.argparse_expected_one",
+    "expected at most one argument": "cli.argparse_expected_at_most",
+    "expected at least one argument": "cli.argparse_expected_at_least",
+    "unexpected option string: %s": "cli.argparse_unexpected_option",
 }
 
 
@@ -89,11 +95,11 @@ def _positive_budget(value: str) -> float:
     try:
         budget = float(value)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError(f"invalid float value: {value!r}") from exc
+        raise argparse.ArgumentTypeError(t("cli.invalid_float", value=value)) from exc
     import math
 
     if not math.isfinite(budget) or budget <= 0:
-        raise argparse.ArgumentTypeError("must be a finite number greater than 0")
+        raise argparse.ArgumentTypeError(t("cli.finite_number"))
     return budget
 
 
@@ -101,9 +107,9 @@ def _positive_int(value: str) -> int:
     try:
         parsed = int(value)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError(f"invalid int value: {value!r}") from exc
+        raise argparse.ArgumentTypeError(t("cli.invalid_int", value=value)) from exc
     if parsed <= 0:
-        raise argparse.ArgumentTypeError("must be an integer greater than 0")
+        raise argparse.ArgumentTypeError(t("cli.positive_integer"))
     return parsed
 
 
@@ -114,6 +120,7 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=t("cli.description"),
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        allow_abbrev=False,
         epilog=f"""
 {t("cli.examples_header")}
   # {t("cli.example_web_app")}
