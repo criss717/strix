@@ -372,6 +372,16 @@ class TestArgparseBuiltins:
         assert t("cli.finite_number") == "debe ser un número finito mayor que 0"
         assert t("cli.positive_integer") == "debe ser un entero mayor que 0"
 
+    def test_config_abbreviation_resolves(self):
+        ns, _ = cli_args._ABBREV_PARSER.parse_known_args(["--conf", "x.json"])
+        assert ns.config == "x.json"
+        assert ns.language is None
+
+    def test_language_abbreviation_resolves(self):
+        ns, _ = cli_args._ABBREV_PARSER.parse_known_args(["--lang", "es"])
+        assert ns.language == "es"
+        assert ns.config is None
+
 
 class TestSettingsLanguageField:
     def test_settings_has_language_field(self):

@@ -53,33 +53,39 @@ def _translate_argparse(message: str) -> str:
 argparse._ = _translate_argparse  # type: ignore[attr-defined]
 
 
+# A minimal parser used to resolve --language/--config BEFORE the full parser
+# renders help text. It reuses argparse's own abbreviation rules (e.g.
+# ``--conf`` -> ``--config``), so language resolution accepts exactly what the
+# real parse accepts. ``exit_on_error=False`` makes a malformed known option
+# raise instead of printing, so the full parser reports it once.
+_ABBREV_PARSER = argparse.ArgumentParser(
+    add_help=False, allow_abbrev=True, exit_on_error=False
+)
+_ABBREV_PARSER.add_argument("-l", "--language")
+_ABBREV_PARSER.add_argument("--config")
+
+
 def _pre_resolve_language() -> None:
     """Resolve language from --language/-l and --config before argparse runs.
 
     Argparse evaluates help text at parse time, so we must resolve the language
-    BEFORE parse_args() is called. This pre-scans sys.argv for the flags.
+    BEFORE parse_args() is called. A minimal parser resolves the same option
+    abbreviations the real parse accepts (e.g. ``--conf`` -> ``--config``).
     Priority matches ``_detect_language``: --language > STRIX_LANGUAGE env >
     --config file > default config > system locale.
     """
-    argv = sys.argv[1:]
-    language: str | None = None
-    config_path: str | None = None
-    for i, arg in enumerate(argv):
-        if arg in ("-l", "--language") and i + 1 < len(argv):
-            language = argv[i + 1]
-        elif arg.startswith("--language="):
-            language = arg.split("=", 1)[1]
-        elif arg == "--config" and i + 1 < len(argv):
-            config_path = argv[i + 1]
-        elif arg.startswith("--config="):
-            config_path = arg.split("=", 1)[1]
-
     from strix.i18n import set_config_path, set_language
 
-    if language:
-        set_language(language)
-    elif config_path:
-        set_config_path(config_path)
+    try:
+        namespace, _ = _ABBREV_PARSER.parse_known_args(sys.argv[1:])
+    except argparse.ArgumentError:
+        # A malformed --language/--config; the full parser reports it.
+        return
+
+    if namespace.language:
+        set_language(namespace.language)
+    elif namespace.config:
+        set_config_path(namespace.config)
 
 
 def get_version() -> str:
@@ -120,7 +126,6 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=t("cli.description"),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        allow_abbrev=False,
         epilog=f"""
 {t("cli.examples_header")}
   # {t("cli.example_web_app")}
