@@ -13,7 +13,7 @@
   "cli.max_turns_help": "Máximo de turnos por agente (> 0, por defecto %(default)s). Cada agente se detiene forzosamente al alcanzar este límite, con advertencias graduales al acercarse.",
   "cli.resume_help": "Reanudar un escaneo anterior por nombre de ejecución (el directorio bajo ./strix_runs/). Retoma el historial LLM completo del agente raíz y subagentes no terminados. Omite la generación de nombre nuevo.",
   "cli.language_help": "Idioma para la interfaz y respuestas de agentes (ej: 'en', 'es'). Por defecto: auto-detectar del entorno.",
-  "cli.workspace_file_help": "Coloca un archivo de esta máquina en el workspace del sandbox antes de que comience el escaneo, por ejemplo una wordlist, una especificación de API o notas. Repite la opción para más archivos. DEST es la ruta dentro de /workspace y por defecto usa el nombre del archivo (por ejemplo '--workspace-file ./wordlist.txt:lists/wordlist.txt'). El archivo es de solo lectura dentro del sandbox y queda fuera de cada directorio de objetivo.",
+  "cli.workspace_file_help": "Place a file from this machine into the sandbox workspace before the scan starts, for example a wordlist, an API specification, or notes. Repeat the option for more files. DEST is the path inside /workspace and defaults to the file name (...). Strix copies the file into the sandbox, outside every target directory. The agent can edit the copy. The file on this machine does not change.",
   "cli.examples_header": "Ejemplos:",
   "cli.argparse_usage": "uso: ",
   "cli.argparse_options": "opciones",
